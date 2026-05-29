@@ -11,11 +11,9 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - run: git config --global --add safe.directory '*'
-
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -31,11 +29,17 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Generate app icons
-        run: flutter pub run flutter_launcher_icons
+      - name: Fix telephony library
+        run: |
+          # إصلاح مشكلة namespace في مكتبة telephony القديمة
+          TELEPHONY_GRADLE=$(find ~/.pub-cache -path "*/telephony-0.2.0/android/build.gradle" 2>/dev/null | head -1)
+          if [ -n "$TELEPHONY_GRADLE" ]; then
+            echo "Patching $TELEPHONY_GRADLE"
+            sed -i '1i android {\n    namespace "com.telephony"\n}\n' $TELEPHONY_GRADLE
+          fi
 
       - name: Build APK
-        run: flutter build apk --release --android-skip-build-dependency-validation
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
