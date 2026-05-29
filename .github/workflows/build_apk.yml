@@ -31,47 +31,39 @@ jobs:
 
       - name: Fix telephony library
         run: |
-          # البحث عن ملف build.gradle الخاص بمكتبة telephony
           TELEPHONY_GRADLE=$(find ~/.pub-cache -path "*/telephony-0.2.0/android/build.gradle" 2>/dev/null | head -1)
           if [ -n "$TELEPHONY_GRADLE" ]; then
             echo "✅ Found telephony at: $TELEPHONY_GRADLE"
-            
-            # حذف الملف القديم
             rm -f "$TELEPHONY_GRADLE"
-            
-            # إنشاء ملف جديد وصحيح
-            cat > "$TELEPHONY_GRADLE" << 'EOF'
-            group 'com.psplug.telephony'
-            version '1.0-SNAPSHOT'
-            
-            buildscript {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:7.4.2'
-                }
-            }
-            
-            apply plugin: 'com.android.library'
-            
-            android {
-                namespace 'com.telephony'
-                compileSdk 34
-            
-                defaultConfig {
-                    minSdk 21
-                    targetSdk 34
-                }
-            
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_11
-                    targetCompatibility JavaVersion.VERSION_11
-                }
-            }
-            EOF
-            
+            echo "group 'com.psplug.telephony'" > "$TELEPHONY_GRADLE"
+            echo "version '1.0-SNAPSHOT'" >> "$TELEPHONY_GRADLE"
+            echo "" >> "$TELEPHONY_GRADLE"
+            echo "buildscript {" >> "$TELEPHONY_GRADLE"
+            echo "    repositories {" >> "$TELEPHONY_GRADLE"
+            echo "        google()" >> "$TELEPHONY_GRADLE"
+            echo "        mavenCentral()" >> "$TELEPHONY_GRADLE"
+            echo "    }" >> "$TELEPHONY_GRADLE"
+            echo "    dependencies {" >> "$TELEPHONY_GRADLE"
+            echo "        classpath 'com.android.tools.build:gradle:7.4.2'" >> "$TELEPHONY_GRADLE"
+            echo "    }" >> "$TELEPHONY_GRADLE"
+            echo "}" >> "$TELEPHONY_GRADLE"
+            echo "" >> "$TELEPHONY_GRADLE"
+            echo "apply plugin: 'com.android.library'" >> "$TELEPHONY_GRADLE"
+            echo "" >> "$TELEPHONY_GRADLE"
+            echo "android {" >> "$TELEPHONY_GRADLE"
+            echo "    namespace 'com.telephony'" >> "$TELEPHONY_GRADLE"
+            echo "    compileSdk 34" >> "$TELEPHONY_GRADLE"
+            echo "" >> "$TELEPHONY_GRADLE"
+            echo "    defaultConfig {" >> "$TELEPHONY_GRADLE"
+            echo "        minSdk 21" >> "$TELEPHONY_GRADLE"
+            echo "        targetSdk 34" >> "$TELEPHONY_GRADLE"
+            echo "    }" >> "$TELEPHONY_GRADLE"
+            echo "" >> "$TELEPHONY_GRADLE"
+            echo "    compileOptions {" >> "$TELEPHONY_GRADLE"
+            echo "        sourceCompatibility JavaVersion.VERSION_11" >> "$TELEPHONY_GRADLE"
+            echo "        targetCompatibility JavaVersion.VERSION_11" >> "$TELEPHONY_GRADLE"
+            echo "    }" >> "$TELEPHONY_GRADLE"
+            echo "}" >> "$TELEPHONY_GRADLE"
             echo "✅ Fixed telephony library successfully"
           else
             echo "⚠️ Telephony gradle file not found"
