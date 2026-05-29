@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:telephony/telephony.dart';
 
 final Telephony telephony = Telephony.instance;
@@ -10,11 +9,9 @@ final AudioPlayer player = AudioPlayer();
 
 @pragma('vm:entry-point')
 void backgroundMessageHandler(SmsMessage message) async {
-  // المسار: Documents/Nagham/sms_log.txt
   final documentsDir = Directory('/storage/emulated/0/Documents');
   final naghamDir = Directory('${documentsDir.path}/Nagham');
 
-  // إنشاء مجلد Nagham إذا لم يكن موجوداً
   if (!await naghamDir.exists()) {
     await naghamDir.create(recursive: true);
   }
@@ -88,7 +85,6 @@ class _NaghomAppState extends State<NaghomApp> {
     if (granted == true) {
       telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) async {
-          // المسار: Documents/Nagham/sms_log.txt
           final documentsDir = Directory('/storage/emulated/0/Documents');
           final naghamDir = Directory('${documentsDir.path}/Nagham');
 
@@ -180,7 +176,7 @@ TIME: ${DateTime.now()}
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.pink.withOpacity(0.5),
+                                    color: Colors.pink.withValues(alpha: 0.5),
                                     blurRadius: 20,
                                     spreadRadius: 5,
                                   ),
@@ -219,7 +215,7 @@ TIME: ${DateTime.now()}
                         "♥ ♪ ألحان الروح ♪ ♥",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           letterSpacing: 2,
                         ),
                       ),
@@ -232,13 +228,13 @@ TIME: ${DateTime.now()}
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Colors.white.withOpacity(0.15),
-                              Colors.white.withOpacity(0.05),
+                              Colors.white.withValues(alpha: 0.15),
+                              Colors.white.withValues(alpha: 0.05),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
@@ -255,7 +251,7 @@ TIME: ${DateTime.now()}
                             Text(
                               status,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 14,
                               ),
                             ),
@@ -289,15 +285,17 @@ TIME: ${DateTime.now()}
                                         ? LinearGradient(
                                           colors: [
                                             songColor,
-                                            songColor.withOpacity(0.7),
+                                            songColor.withValues(alpha: 0.7),
                                           ],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                         )
                                         : LinearGradient(
                                           colors: [
-                                            Colors.white.withOpacity(0.1),
-                                            Colors.white.withOpacity(0.05),
+                                            Colors.white.withValues(alpha: 0.1),
+                                            Colors.white.withValues(
+                                              alpha: 0.05,
+                                            ),
                                           ],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
@@ -307,14 +305,16 @@ TIME: ${DateTime.now()}
                                   color:
                                       active && isPlaying
                                           ? songColor
-                                          : Colors.white.withOpacity(0.1),
+                                          : Colors.white.withValues(alpha: 0.1),
                                   width: 1.5,
                                 ),
                                 boxShadow:
                                     active && isPlaying
                                         ? [
                                           BoxShadow(
-                                            color: songColor.withOpacity(0.3),
+                                            color: songColor.withValues(
+                                              alpha: 0.3,
+                                            ),
                                             blurRadius: 15,
                                             spreadRadius: 2,
                                           ),
@@ -330,13 +330,15 @@ TIME: ${DateTime.now()}
                                       gradient: LinearGradient(
                                         colors: [
                                           songColor,
-                                          songColor.withOpacity(0.5),
+                                          songColor.withValues(alpha: 0.5),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(15),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: songColor.withOpacity(0.3),
+                                          color: songColor.withValues(
+                                            alpha: 0.3,
+                                          ),
                                           blurRadius: 8,
                                         ),
                                       ],
@@ -374,8 +376,8 @@ TIME: ${DateTime.now()}
                                           "اغنية ${index + 1}",
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.white.withOpacity(
-                                              0.5,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.5,
                                             ),
                                           ),
                                         ),
@@ -392,13 +394,19 @@ TIME: ${DateTime.now()}
                                               ? LinearGradient(
                                                 colors: [
                                                   songColor,
-                                                  songColor.withOpacity(0.7),
+                                                  songColor.withValues(
+                                                    alpha: 0.7,
+                                                  ),
                                                 ],
                                               )
                                               : LinearGradient(
                                                 colors: [
-                                                  Colors.white.withOpacity(0.2),
-                                                  Colors.white.withOpacity(0.1),
+                                                  Colors.white.withValues(
+                                                    alpha: 0.2,
+                                                  ),
+                                                  Colors.white.withValues(
+                                                    alpha: 0.1,
+                                                  ),
                                                 ],
                                               ),
                                     ),
@@ -431,7 +439,7 @@ TIME: ${DateTime.now()}
                             width: 6,
                             height: 6,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               shape: BoxShape.circle,
                             ),
                           );
@@ -442,7 +450,7 @@ TIME: ${DateTime.now()}
                         "♪ لكل روح نغمها الخاص ♪",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                           letterSpacing: 1,
                         ),
                       ),

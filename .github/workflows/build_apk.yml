@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,19 +28,14 @@ jobs:
       - name: Flutter Version
         run: flutter --version
 
-      - name: Upgrade Flutter packages
-        run: flutter pub upgrade
-
       - name: Get Dependencies
         run: flutter pub get
 
-      # 👇 خطوة توليد الأيقونات
       - name: Generate app icons
         run: flutter pub run flutter_launcher_icons
 
-      # 👇 خطوة البناء مع تعطيل tree shake للأيقونات
       - name: Build APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release --android-skip-build-dependency-validation
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
