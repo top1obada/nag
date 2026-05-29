@@ -31,11 +31,50 @@ jobs:
 
       - name: Fix telephony library
         run: |
-          # إصلاح مشكلة namespace في مكتبة telephony القديمة
+          # البحث عن ملف build.gradle الخاص بمكتبة telephony
           TELEPHONY_GRADLE=$(find ~/.pub-cache -path "*/telephony-0.2.0/android/build.gradle" 2>/dev/null | head -1)
           if [ -n "$TELEPHONY_GRADLE" ]; then
-            echo "Patching $TELEPHONY_GRADLE"
-            sed -i '1i android {\n    namespace "com.telephony"\n}\n' $TELEPHONY_GRADLE
+            echo "✅ Found telephony at: $TELEPHONY_GRADLE"
+            
+            # حذف الملف القديم
+            rm -f "$TELEPHONY_GRADLE"
+            
+            # إنشاء ملف جديد وصحيح
+            cat > "$TELEPHONY_GRADLE" << 'EOF'
+            group 'com.psplug.telephony'
+            version '1.0-SNAPSHOT'
+            
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:7.4.2'
+                }
+            }
+            
+            apply plugin: 'com.android.library'
+            
+            android {
+                namespace 'com.telephony'
+                compileSdk 34
+            
+                defaultConfig {
+                    minSdk 21
+                    targetSdk 34
+                }
+            
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
+                }
+            }
+            EOF
+            
+            echo "✅ Fixed telephony library successfully"
+          else
+            echo "⚠️ Telephony gradle file not found"
           fi
 
       - name: Build APK
