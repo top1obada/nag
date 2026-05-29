@@ -29,59 +29,14 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Fix telephony library completely
+      - name: Fix telephony library
         run: |
-          # البحث عن مجلد telephony
           TELEPHONY_DIR=$(find ~/.pub-cache -type d -name "telephony-0.2.0" 2>/dev/null | head -1)
-          
           if [ -n "$TELEPHONY_DIR" ]; then
-            echo "✅ Found telephony at: $TELEPHONY_DIR"
-            
-            # 1. إصلاح build.gradle
-            rm -f "$TELEPHONY_DIR/android/build.gradle"
-            cat > "$TELEPHONY_DIR/android/build.gradle" << 'EOF'
-            group 'com.psplug.telephony'
-            version '1.0-SNAPSHOT'
-            
-            buildscript {
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:7.4.2'
-                }
-            }
-            
-            apply plugin: 'com.android.library'
-            
-            android {
-                namespace 'com.shounakmulay.telephony'
-                compileSdk 34
-            
-                defaultConfig {
-                    minSdk 21
-                    targetSdk 34
-                }
-            
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_11
-                    targetCompatibility JavaVersion.VERSION_11
-                }
-            }
-            EOF
-            
-            # 2. إصلاح AndroidManifest.xml (إزالة package attribute)
-            MANIFEST_FILE="$TELEPHONY_DIR/android/src/main/AndroidManifest.xml"
-            if [ -f "$MANIFEST_FILE" ]; then
-              # إزالة package="com.shounakmulay.telephony" من المانيفست
-              sed -i 's/ package="com.shounakmulay.telephony"//g' "$MANIFEST_FILE"
-              echo "✅ Fixed AndroidManifest.xml"
-            fi
-            
-            echo "✅ Fixed telephony library completely"
-          else
-            echo "⚠️ Telephony directory not found"
+            echo "Found telephony at: $TELEPHONY_DIR"
+            echo "android { namespace 'com.shounakmulay.telephony' compileSdk 34 defaultConfig { minSdk 21 targetSdk 34 } }" > "$TELEPHONY_DIR/android/build.gradle"
+            echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><manifest />" > "$TELEPHONY_DIR/android/src/main/AndroidManifest.xml"
+            echo "Telephony library fixed"
           fi
 
       - name: Build APK
