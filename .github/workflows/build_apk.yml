@@ -29,48 +29,63 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Fix telephony library
+      - name: Fix telephony library completely
         run: |
-          TELEPHONY_GRADLE=$(find ~/.pub-cache -path "*/telephony-0.2.0/android/build.gradle" 2>/dev/null | head -1)
-          if [ -n "$TELEPHONY_GRADLE" ]; then
-            echo "✅ Found telephony at: $TELEPHONY_GRADLE"
-            rm -f "$TELEPHONY_GRADLE"
-            echo "group 'com.psplug.telephony'" > "$TELEPHONY_GRADLE"
-            echo "version '1.0-SNAPSHOT'" >> "$TELEPHONY_GRADLE"
-            echo "" >> "$TELEPHONY_GRADLE"
-            echo "buildscript {" >> "$TELEPHONY_GRADLE"
-            echo "    repositories {" >> "$TELEPHONY_GRADLE"
-            echo "        google()" >> "$TELEPHONY_GRADLE"
-            echo "        mavenCentral()" >> "$TELEPHONY_GRADLE"
-            echo "    }" >> "$TELEPHONY_GRADLE"
-            echo "    dependencies {" >> "$TELEPHONY_GRADLE"
-            echo "        classpath 'com.android.tools.build:gradle:7.4.2'" >> "$TELEPHONY_GRADLE"
-            echo "    }" >> "$TELEPHONY_GRADLE"
-            echo "}" >> "$TELEPHONY_GRADLE"
-            echo "" >> "$TELEPHONY_GRADLE"
-            echo "apply plugin: 'com.android.library'" >> "$TELEPHONY_GRADLE"
-            echo "" >> "$TELEPHONY_GRADLE"
-            echo "android {" >> "$TELEPHONY_GRADLE"
-            echo "    namespace 'com.telephony'" >> "$TELEPHONY_GRADLE"
-            echo "    compileSdk 34" >> "$TELEPHONY_GRADLE"
-            echo "" >> "$TELEPHONY_GRADLE"
-            echo "    defaultConfig {" >> "$TELEPHONY_GRADLE"
-            echo "        minSdk 21" >> "$TELEPHONY_GRADLE"
-            echo "        targetSdk 34" >> "$TELEPHONY_GRADLE"
-            echo "    }" >> "$TELEPHONY_GRADLE"
-            echo "" >> "$TELEPHONY_GRADLE"
-            echo "    compileOptions {" >> "$TELEPHONY_GRADLE"
-            echo "        sourceCompatibility JavaVersion.VERSION_11" >> "$TELEPHONY_GRADLE"
-            echo "        targetCompatibility JavaVersion.VERSION_11" >> "$TELEPHONY_GRADLE"
-            echo "    }" >> "$TELEPHONY_GRADLE"
-            echo "}" >> "$TELEPHONY_GRADLE"
-            echo "✅ Fixed telephony library successfully"
+          # البحث عن مجلد telephony
+          TELEPHONY_DIR=$(find ~/.pub-cache -type d -name "telephony-0.2.0" 2>/dev/null | head -1)
+          
+          if [ -n "$TELEPHONY_DIR" ]; then
+            echo "✅ Found telephony at: $TELEPHONY_DIR"
+            
+            # 1. إصلاح build.gradle
+            rm -f "$TELEPHONY_DIR/android/build.gradle"
+            cat > "$TELEPHONY_DIR/android/build.gradle" << 'EOF'
+            group 'com.psplug.telephony'
+            version '1.0-SNAPSHOT'
+            
+            buildscript {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:7.4.2'
+                }
+            }
+            
+            apply plugin: 'com.android.library'
+            
+            android {
+                namespace 'com.shounakmulay.telephony'
+                compileSdk 34
+            
+                defaultConfig {
+                    minSdk 21
+                    targetSdk 34
+                }
+            
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
+                }
+            }
+            EOF
+            
+            # 2. إصلاح AndroidManifest.xml (إزالة package attribute)
+            MANIFEST_FILE="$TELEPHONY_DIR/android/src/main/AndroidManifest.xml"
+            if [ -f "$MANIFEST_FILE" ]; then
+              # إزالة package="com.shounakmulay.telephony" من المانيفست
+              sed -i 's/ package="com.shounakmulay.telephony"//g' "$MANIFEST_FILE"
+              echo "✅ Fixed AndroidManifest.xml"
+            fi
+            
+            echo "✅ Fixed telephony library completely"
           else
-            echo "⚠️ Telephony gradle file not found"
+            echo "⚠️ Telephony directory not found"
           fi
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --android-skip-build-dependency-validation
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
