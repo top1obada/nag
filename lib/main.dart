@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:telephony_fix/telephony.dart';
+
+import 'package:telephony/telephony.dart';
 
 final Telephony telephony = Telephony.instance;
 final AudioPlayer player = AudioPlayer();

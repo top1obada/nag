@@ -429,14 +429,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
-  telephony_fix:
+  telephony:
     dependency: "direct main"
     description:
-      name: telephony_fix
-      sha256: "1d471b2b52157c74a37460908dfdc25b3bc15ba6ac4294f9265c00f29c14ab31"
+      name: telephony
+      sha256: "821e074acec3c611e48edadd50a6d9fef864943771a545da7924adcc8509ada9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.1"
+    version: "0.2.0"
   term_glyph:
     dependency: transitive
     description:

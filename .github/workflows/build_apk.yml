@@ -29,6 +29,17 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
+      - name: Fix telephony library
+        run: |
+          TELEPHONY_DIR=$(find ~/.pub-cache -type d -name "telephony-0.2.0" 2>/dev/null | head -1)
+          if [ -n "$TELEPHONY_DIR" ]; then
+            rm -f "$TELEPHONY_DIR/android/build.gradle"
+            echo "android { namespace 'com.telephony' compileSdk 34 defaultConfig { minSdk 21 targetSdk 34 } }" > "$TELEPHONY_DIR/android/build.gradle"
+            mkdir -p "$TELEPHONY_DIR/android/src/main"
+            echo '<?xml version="1.0" encoding="utf-8"?><manifest />' > "$TELEPHONY_DIR/android/src/main/AndroidManifest.xml"
+            echo "✅ Telephony library fixed"
+          fi
+
       - name: Build APK
         run: flutter build apk --release
 
