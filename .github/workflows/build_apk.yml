@@ -34,51 +34,48 @@ jobs:
           TELEPHONY_DIR=$(find ~/.pub-cache -type d -name "telephony-0.2.0" 2>/dev/null | head -1)
           if [ -n "$TELEPHONY_DIR" ]; then
             echo "✅ Found telephony at: $TELEPHONY_DIR"
-            
-            cat > "$TELEPHONY_DIR/android/build.gradle" << 'EOF'
-            group 'com.shounakmulay.telephony'
-            version '1.0-SNAPSHOT'
-            
-            buildscript {
-                ext.kotlin_version = '1.8.22'
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-                dependencies {
-                    classpath 'com.android.tools.build:gradle:7.4.2'
-                    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-                }
-            }
-            
-            apply plugin: 'com.android.library'
-            apply plugin: 'kotlin-android'
-            
-            android {
-                namespace 'com.shounakmulay.telephony'
-                compileSdk 34
-            
-                defaultConfig {
-                    minSdk 21
-                    targetSdk 34
-                }
-            
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_11
-                    targetCompatibility JavaVersion.VERSION_11
-                }
-            
-                kotlinOptions {
-                    jvmTarget = '11'
-                }
-            }
-            
-            dependencies {
-                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:\$kotlin_version"
-                implementation 'androidx.annotation:annotation:1.7.0'
-            }
-            EOF
-            
+            rm -f "$TELEPHONY_DIR/android/build.gradle"
+            echo "group 'com.shounakmulay.telephony'" > "$TELEPHONY_DIR/android/build.gradle"
+            echo "version '1.0-SNAPSHOT'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "buildscript {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    ext.kotlin_version = '1.8.22'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    repositories {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        google()" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        mavenCentral()" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    }" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    dependencies {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        classpath 'com.android.tools.build:gradle:7.4.2'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        classpath \"org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlin_version\"" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    }" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "}" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "apply plugin: 'com.android.library'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "apply plugin: 'kotlin-android'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "android {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    namespace 'com.shounakmulay.telephony'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    compileSdk 34" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    defaultConfig {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        minSdk 21" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        targetSdk 34" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    }" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    compileOptions {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        sourceCompatibility JavaVersion.VERSION_11" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        targetCompatibility JavaVersion.VERSION_11" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    }" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    kotlinOptions {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "        jvmTarget = '11'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    }" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "}" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "dependencies {" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk7:\$kotlin_version\"" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "    implementation 'androidx.annotation:annotation:1.7.0'" >> "$TELEPHONY_DIR/android/build.gradle"
+            echo "}" >> "$TELEPHONY_DIR/android/build.gradle"
             echo "✅ Telephony library fixed"
           else
             echo "⚠️ Telephony directory not found"
