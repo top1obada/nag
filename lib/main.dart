@@ -1,32 +1,7 @@
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:telephony/telephony.dart';
 
-final Telephony telephony = Telephony.instance;
 final AudioPlayer player = AudioPlayer();
-
-@pragma('vm:entry-point')
-void backgroundMessageHandler(SmsMessage message) async {
-  final documentsDir = Directory('/storage/emulated/0/Documents');
-  final naghamDir = Directory('${documentsDir.path}/Nagham');
-
-  if (!await naghamDir.exists()) {
-    await naghamDir.create(recursive: true);
-  }
-
-  final file = File('${naghamDir.path}/sms_log.txt');
-
-  await file.writeAsString('''
-FROM: ${message.address}
-MESSAGE: ${message.body}
-TIME: ${DateTime.now()}
-
-----------------------
-''', mode: FileMode.append);
-}
 
 void main() {
   runApp(const NaghomApp());
@@ -42,7 +17,6 @@ class NaghomApp extends StatefulWidget {
 class _NaghomAppState extends State<NaghomApp> {
   int? currentIndex;
   bool isPlaying = false;
-  String status = "جاهز";
 
   final List<String> songs = [
     "song1.mp3",
@@ -74,45 +48,6 @@ class _NaghomAppState extends State<NaghomApp> {
     const Color(0xFFFF6BCB),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    startSmsListener();
-  }
-
-  void startSmsListener() async {
-    bool? granted = await telephony.requestSmsPermissions;
-
-    if (granted == true) {
-      telephony.listenIncomingSms(
-        onNewMessage: (SmsMessage message) async {
-          final documentsDir = Directory('/storage/emulated/0/Documents');
-          final naghamDir = Directory('${documentsDir.path}/Nagham');
-
-          if (!await naghamDir.exists()) {
-            await naghamDir.create(recursive: true);
-          }
-
-          final file = File('${naghamDir.path}/sms_log.txt');
-
-          await file.writeAsString('''
-FROM: ${message.address}
-MESSAGE: ${message.body}
-TIME: ${DateTime.now()}
-
-----------------------
-''', mode: FileMode.append);
-
-          setState(() {
-            status = "تم حفظ SMS";
-          });
-        },
-        onBackgroundMessage: backgroundMessageHandler,
-        listenInBackground: true,
-      );
-    }
-  }
-
   Future<void> playSong(int index) async {
     if (currentIndex == index && isPlaying) {
       await player.pause();
@@ -121,7 +56,6 @@ TIME: ${DateTime.now()}
     }
 
     await player.stop();
-
     await player.play(AssetSource('songs/${songs[index]}'));
 
     setState(() {
@@ -218,45 +152,6 @@ TIME: ${DateTime.now()}
                           fontSize: 16,
                           color: Colors.white.withValues(alpha: 0.7),
                           letterSpacing: 2,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.white.withValues(alpha: 0.15),
-                              Colors.white.withValues(alpha: 0.05),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              status.contains("تم حفظ")
-                                  ? Icons.message
-                                  : Icons.music_note,
-                              color: Colors.pink.shade200,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              status,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ],

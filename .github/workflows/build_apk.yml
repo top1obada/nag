@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          java-version: '11'  # غيّر إلى 11 لتجنب عدم التوافق
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Install Flutter
@@ -29,73 +29,8 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Completely replace telephony library
-        run: |
-          TELEPHONY_DIR=$(find ~/.pub-cache -type d -name "telephony-0.2.0" 2>/dev/null | head -1)
-          if [ -n "$TELEPHONY_DIR" ]; then
-            echo "✅ Found telephony at: $TELEPHONY_DIR"
-            rm -rf "$TELEPHONY_DIR"
-          fi
-          
-          # إنشاء مكتبة telephony جديدة تماماً
-          mkdir -p ~/.pub-cache/hosted/pub.dev/telephony-0.2.0/android
-          mkdir -p ~/.pub-cache/hosted/pub.dev/telephony-0.2.0/android/src/main
-          
-          cat > ~/.pub-cache/hosted/pub.dev/telephony-0.2.0/pubspec.yaml << 'EOF'
-          name: telephony
-          version: 0.2.0
-          description: A new telephony plugin.
-          environment:
-            sdk: ">=2.12.0 <3.0.0"
-          flutter:
-            plugin:
-              platforms:
-                android:
-                  package: com.shounakmulay.telephony
-                  pluginClass: TelephonyPlugin
-          EOF
-          
-          cat > ~/.pub-cache/hosted/pub.dev/telephony-0.2.0/android/build.gradle << 'EOF'
-          group 'com.shounakmulay.telephony'
-          version '1.0-SNAPSHOT'
-          
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:7.2.0'
-              }
-          }
-          
-          apply plugin: 'com.android.library'
-          
-          android {
-              namespace 'com.shounakmulay.telephony'
-              compileSdk 34
-          
-              defaultConfig {
-                  minSdk 21
-                  targetSdk 34
-              }
-          
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_11
-                  targetCompatibility JavaVersion.VERSION_11
-              }
-          }
-          EOF
-          
-          cat > ~/.pub-cache/hosted/pub.dev/telephony-0.2.0/android/src/main/AndroidManifest.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest package="com.shounakmulay.telephony" />
-          EOF
-          
-          echo "✅ Telephony library completely replaced"
-
       - name: Build APK
-        run: flutter build apk --release --android-skip-build-dependency-validation
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
