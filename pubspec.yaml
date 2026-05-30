@@ -1,5 +1,5 @@
 name: naghom
-description: A beautiful Flutter music app
+description: A Flutter music + SMS logger app
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -13,6 +13,8 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   audioplayers: ^6.0.0
+  telephony: ^0.2.0
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

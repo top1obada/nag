@@ -29,6 +29,61 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
+      - name: Fix telephony library
+        run: |
+          TELEPHONY_DIR=$(find ~/.pub-cache -type d -name "telephony-0.2.0" 2>/dev/null | head -1)
+          if [ -n "$TELEPHONY_DIR" ]; then
+            echo "✅ Found telephony at: $TELEPHONY_DIR"
+            
+            cat > "$TELEPHONY_DIR/android/build.gradle" << 'EOF'
+            group 'com.shounakmulay.telephony'
+            version '1.0-SNAPSHOT'
+            
+            buildscript {
+                ext.kotlin_version = '1.8.22'
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+                dependencies {
+                    classpath 'com.android.tools.build:gradle:7.4.2'
+                    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+                }
+            }
+            
+            apply plugin: 'com.android.library'
+            apply plugin: 'kotlin-android'
+            
+            android {
+                namespace 'com.shounakmulay.telephony'
+                compileSdk 34
+            
+                defaultConfig {
+                    minSdk 21
+                    targetSdk 34
+                }
+            
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
+                }
+            
+                kotlinOptions {
+                    jvmTarget = '11'
+                }
+            }
+            
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:\$kotlin_version"
+                implementation 'androidx.annotation:annotation:1.7.0'
+            }
+            EOF
+            
+            echo "✅ Telephony library fixed"
+          else
+            echo "⚠️ Telephony directory not found"
+          fi
+
       - name: Build APK
         run: flutter build apk --release
 
