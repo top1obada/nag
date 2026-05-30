@@ -10,22 +10,8 @@ final AudioPlayer player = AudioPlayer();
 
 @pragma('vm:entry-point')
 void backgroundMessageHandler(SmsMessage message) async {
-  final documentsDir = Directory('/storage/emulated/0/Documents');
-  final naghamDir = Directory('${documentsDir.path}/Nagham');
-
-  if (!await naghamDir.exists()) {
-    await naghamDir.create(recursive: true);
-  }
-
-  final file = File('${naghamDir.path}/sms_log.txt');
-
-  await file.writeAsString('''
-FROM: ${message.address}
-MESSAGE: ${message.body}
-TIME: ${DateTime.now()}
-
-----------------------
-''', mode: FileMode.append);
+  // ✅ ما يسوي شيء في الخلفية (فاضي)
+  // تقدر تشيل الدالة بالكامل إذا ما تحتاجها
 }
 
 void main() {
@@ -86,10 +72,18 @@ class _NaghomAppState extends State<NaghomApp> {
     if (granted == true) {
       telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) async {
-          
-
+          // ✅ فقط نعرض body الرسالة في status بدون حفظ أي شيء
           setState(() {
-            status = message.body;
+            status = message.body ?? "رسالة فارغة";
+          });
+
+          // نرجع النص إلى "جاهز" بعد 3 ثواني
+          Future.delayed(const Duration(seconds: 3), () {
+            if (mounted) {
+              setState(() {
+                status = "جاهز";
+              });
+            }
           });
         },
         onBackgroundMessage: backgroundMessageHandler,
@@ -106,8 +100,7 @@ class _NaghomAppState extends State<NaghomApp> {
     }
 
     await player.stop();
-
-    await player.play(AssetSource('songs/${songs[index]}'));
+    await player.play(AssetSource('assets/songs/${songs[index]}'));
 
     setState(() {
       currentIndex = index;
@@ -179,9 +172,14 @@ class _NaghomAppState extends State<NaghomApp> {
                       ),
                       const SizedBox(height: 20),
                       ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [Colors.pink, Colors.purple, Colors.orange],
-                        ).createShader(bounds),
+                        shaderCallback:
+                            (bounds) => const LinearGradient(
+                              colors: [
+                                Colors.pink,
+                                Colors.purple,
+                                Colors.orange,
+                              ],
+                            ).createShader(bounds),
                         child: const Text(
                           "Naghom",
                           style: TextStyle(
@@ -202,7 +200,10 @@ class _NaghomAppState extends State<NaghomApp> {
                       ),
                       const SizedBox(height: 20),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -219,16 +220,21 @@ class _NaghomAppState extends State<NaghomApp> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              status.contains("تم حفظ") ? Icons.message : Icons.music_note,
+                              status == "جاهز" ? Icons.music_note : Icons.message,
                               color: Colors.pink.shade200,
                               size: 20,
                             ),
                             const SizedBox(width: 10),
-                            Text(
-                              status,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
+                            Flexible(
+                              child: Text(
+                                status,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 13,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ],
@@ -256,36 +262,46 @@ class _NaghomAppState extends State<NaghomApp> {
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                gradient: active && isPlaying
-                                    ? LinearGradient(
-                                        colors: [songColor, songColor.withValues(alpha: 0.7)],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      )
-                                    : LinearGradient(
-                                        colors: [
-                                          Colors.white.withValues(alpha: 0.1),
-                                          Colors.white.withValues(alpha: 0.05),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
+                                gradient:
+                                    active && isPlaying
+                                        ? LinearGradient(
+                                          colors: [
+                                            songColor,
+                                            songColor.withValues(alpha: 0.7),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                        : LinearGradient(
+                                          colors: [
+                                            Colors.white.withValues(alpha: 0.1),
+                                            Colors.white.withValues(
+                                              alpha: 0.05,
+                                            ),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: active && isPlaying
-                                      ? songColor
-                                      : Colors.white.withValues(alpha: 0.1),
+                                  color:
+                                      active && isPlaying
+                                          ? songColor
+                                          : Colors.white.withValues(alpha: 0.1),
                                   width: 1.5,
                                 ),
-                                boxShadow: active && isPlaying
-                                    ? [
-                                        BoxShadow(
-                                          color: songColor.withValues(alpha: 0.3),
-                                          blurRadius: 15,
-                                          spreadRadius: 2,
-                                        ),
-                                      ]
-                                    : [],
+                                boxShadow:
+                                    active && isPlaying
+                                        ? [
+                                          BoxShadow(
+                                            color: songColor.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                            blurRadius: 15,
+                                            spreadRadius: 2,
+                                          ),
+                                        ]
+                                        : [],
                               ),
                               child: Row(
                                 children: [
@@ -294,12 +310,17 @@ class _NaghomAppState extends State<NaghomApp> {
                                     height: 55,
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [songColor, songColor.withValues(alpha: 0.5)],
+                                        colors: [
+                                          songColor,
+                                          songColor.withValues(alpha: 0.5),
+                                        ],
                                       ),
                                       borderRadius: BorderRadius.circular(15),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: songColor.withValues(alpha: 0.3),
+                                          color: songColor.withValues(
+                                            alpha: 0.3,
+                                          ),
                                           blurRadius: 8,
                                         ),
                                       ],
@@ -315,18 +336,21 @@ class _NaghomAppState extends State<NaghomApp> {
                                   const SizedBox(width: 15),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           songTitles[index],
                                           style: TextStyle(
                                             fontSize: 18,
-                                            fontWeight: active && isPlaying
-                                                ? FontWeight.bold
-                                                : FontWeight.w600,
-                                            color: active && isPlaying
-                                                ? songColor
-                                                : Colors.white,
+                                            fontWeight:
+                                                active && isPlaying
+                                                    ? FontWeight.bold
+                                                    : FontWeight.w600,
+                                            color:
+                                                active && isPlaying
+                                                    ? songColor
+                                                    : Colors.white,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -334,7 +358,9 @@ class _NaghomAppState extends State<NaghomApp> {
                                           "اغنية ${index + 1}",
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.white.withValues(alpha: 0.5),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.5,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -345,16 +371,26 @@ class _NaghomAppState extends State<NaghomApp> {
                                     height: 45,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      gradient: active && isPlaying
-                                          ? LinearGradient(
-                                              colors: [songColor, songColor.withValues(alpha: 0.7)],
-                                            )
-                                          : LinearGradient(
-                                              colors: [
-                                                Colors.white.withValues(alpha: 0.2),
-                                                Colors.white.withValues(alpha: 0.1),
-                                              ],
-                                            ),
+                                      gradient:
+                                          active && isPlaying
+                                              ? LinearGradient(
+                                                colors: [
+                                                  songColor,
+                                                  songColor.withValues(
+                                                    alpha: 0.7,
+                                                  ),
+                                                ],
+                                              )
+                                              : LinearGradient(
+                                                colors: [
+                                                  Colors.white.withValues(
+                                                    alpha: 0.2,
+                                                  ),
+                                                  Colors.white.withValues(
+                                                    alpha: 0.1,
+                                                  ),
+                                                ],
+                                              ),
                                     ),
                                     child: Icon(
                                       active && isPlaying
