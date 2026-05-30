@@ -10,8 +10,7 @@ final AudioPlayer player = AudioPlayer();
 
 @pragma('vm:entry-point')
 void backgroundMessageHandler(SmsMessage message) async {
-  // ✅ ما يسوي شيء في الخلفية (فاضي)
-  // تقدر تشيل الدالة بالكامل إذا ما تحتاجها
+  // ما يسوي شيء في الخلفية
 }
 
 void main() {
@@ -72,18 +71,9 @@ class _NaghomAppState extends State<NaghomApp> {
     if (granted == true) {
       telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) async {
-          // ✅ فقط نعرض body الرسالة في status بدون حفظ أي شيء
+          // ✅ فقط نعرض body الرسالة في status بدون حفظ ولا رجوع
           setState(() {
             status = message.body ?? "رسالة فارغة";
-          });
-
-          // نرجع النص إلى "جاهز" بعد 3 ثواني
-          Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) {
-              setState(() {
-                status = "جاهز";
-              });
-            }
           });
         },
         onBackgroundMessage: backgroundMessageHandler,
