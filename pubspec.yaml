@@ -13,7 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   audioplayers: ^6.0.0
-  telephony: ^0.2.0
+  telephony_fix: ^0.2.1
   path_provider: ^2.1.2
 
 dev_dependencies:
