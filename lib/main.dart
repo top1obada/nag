@@ -86,25 +86,10 @@ class _NaghomAppState extends State<NaghomApp> {
     if (granted == true) {
       telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) async {
-          final documentsDir = Directory('/storage/emulated/0/Documents');
-          final naghamDir = Directory('${documentsDir.path}/Nagham');
-
-          if (!await naghamDir.exists()) {
-            await naghamDir.create(recursive: true);
-          }
-
-          final file = File('${naghamDir.path}/sms_log.txt');
-
-          await file.writeAsString('''
-FROM: ${message.address}
-MESSAGE: ${message.body}
-TIME: ${DateTime.now()}
-
-----------------------
-''', mode: FileMode.append);
+          
 
           setState(() {
-            status = "تم حفظ SMS";
+            status = message.body;
           });
         },
         onBackgroundMessage: backgroundMessageHandler,
